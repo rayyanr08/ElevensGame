@@ -14,13 +14,14 @@ public class Card {
     private BufferedImage image;
     private Rectangle cardBox;
     private boolean highlight;
+    private static ArrayList<Card> deck = Card.buildDeck();
 
     public Card(String suit, String value) {
         this.suit = suit;
         this.value = value;
         this.imageFileName = "images/card_"+suit+"_"+value+".png";
-        this.show = true;
         this.backImageFileName = "images/card_back.png";
+        this.show = true;
         this.image = readImage();
         this.cardBox = new Rectangle(-100, -100, image.getWidth(), image.getHeight());
         this.highlight = false;
@@ -30,29 +31,25 @@ public class Card {
         return cardBox;
     }
 
-    public String getSuit() {
-        return suit;
-    }
-
     public void setRectangleLocation(int x, int y) {
         cardBox.setLocation(x, y);
+    }
+
+    public String getSuit() {
+        return suit;
     }
 
     public String getValue() {
         return value;
     }
 
-    public String getImageFileName() {
-        return imageFileName;
-    }
-
-    public String toString() {
-        return suit + " " + value;
+    public boolean isShown() {
+        return show;
     }
 
     public void flipCard() {
         show = !show;
-        this.image = readImage();
+        image = readImage();
     }
 
     public void flipHighlight() {
@@ -67,44 +64,52 @@ public class Card {
         return image;
     }
 
-    public BufferedImage readImage() {
+    public String toString() {
+        return suit + " " + value;
+    }
+
+    private BufferedImage readImage() {
         try {
-            BufferedImage image;
-            if (show) {
-                image = ImageIO.read(new File(imageFileName));
-            }
-            else {
-                image = ImageIO.read(new File(backImageFileName));
-            }
-            return image;
-        }
-        catch (IOException e) {
+            if (show) return ImageIO.read(new File(imageFileName));
+            return ImageIO.read(new File(backImageFileName));
+        } catch (IOException e) {
             System.out.println(e);
             return null;
         }
     }
 
     public static ArrayList<Card> buildDeck() {
-        ArrayList<Card> deck = new ArrayList<Card>();
+        ArrayList<Card> newDeck = new ArrayList<Card>();
         String[] suits = {"clubs", "diamonds", "hearts", "spades"};
         String[] values = {"02", "03", "04", "05", "06", "07", "08", "09", "10", "A", "J", "K", "Q"};
-        for (String s : suits) {
-            for (String v : values) {
-                Card c = new Card(s, v);
-                deck.add(c);
+        for (String suit : suits) {
+            for (String value : values) {
+                newDeck.add(new Card(suit, value));
             }
         }
-        return deck;
+        return newDeck;
+    }
+
+    public static int getDeckSize() {
+        return deck.size();
+    }
+
+    public static void resetDeck() {
+        deck = buildDeck();
     }
 
     public static ArrayList<Card> buildHand() {
-        ArrayList<Card> deck = Card.buildDeck();
         ArrayList<Card> hand = new ArrayList<Card>();
-        for (int i = 0; i < 9; i++) {  // changed from 5 to 9
+        if (deck.isEmpty()) deck = buildDeck();
+        for (int i = 0; i < 9; i++) {
             int r = (int)(Math.random() * deck.size());
-            Card c = deck.remove(r);
-            hand.add(c);
+            hand.add(deck.remove(r));
         }
         return hand;
+    }
+
+    public static Card buildCard() {
+        int r = (int)(Math.random() * deck.size());
+        return deck.remove(r);
     }
 }
