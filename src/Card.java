@@ -14,32 +14,16 @@ public class Card {
     private BufferedImage image;
     private Rectangle cardBox;
     private boolean highlight;
-    private static ArrayList<Card> deck;
-    private boolean ifReplace;
 
     public Card(String suit, String value) {
         this.suit = suit;
         this.value = value;
-        this.imageFileName = "images/card_"+suit+"_"+value+".png"; // image based on card suit and value
+        this.imageFileName = "images/card_"+suit+"_"+value+".png";
         this.show = true;
-        this.backImageFileName = "images/card_back.png"; // same back of card
-
-
-        // which image should I show for the card (front of back)
+        this.backImageFileName = "images/card_back.png";
         this.image = readImage();
-
-
         this.cardBox = new Rectangle(-100, -100, image.getWidth(), image.getHeight());
         this.highlight = false;
-
-        String[] suits = {"clubs", "diamonds", "hearts", "spades"};
-        String[] values = {"02", "03", "04", "05", "06", "07", "08", "09", "10", "A", "J", "K", "Q"};
-        for (String s : suits) {
-            for (String v : values) {
-                Card c = new Card(s, v);
-                deck.add(c);
-            }
-        }
     }
 
     public Rectangle getCardBox() {
@@ -58,10 +42,6 @@ public class Card {
         return value;
     }
 
-    public void setIfReplace(){
-        ifReplace = !ifReplace;
-    }
-
     public String getImageFileName() {
         return imageFileName;
     }
@@ -70,7 +50,6 @@ public class Card {
         return suit + " " + value;
     }
 
-    // called when left click
     public void flipCard() {
         show = !show;
         this.image = readImage();
@@ -88,17 +67,9 @@ public class Card {
         return image;
     }
 
-    public void replaceCard(){
-        if (ifReplace){
-            deck.remove(0);
-        }
-    }
-
-    // BufferedImage object represents image file to be drawn on screen
     public BufferedImage readImage() {
         try {
             BufferedImage image;
-            // if show == true show front else show back
             if (show) {
                 image = ImageIO.read(new File(imageFileName));
             }
@@ -113,14 +84,26 @@ public class Card {
         }
     }
 
-    public static ArrayList<Card> buildHand() {
-        ArrayList<Card> hand = new ArrayList<Card>();
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j<3;j++) {
-                int r = (int) (Math.random() * deck.size());
-                Card c = deck.remove(r);
-                hand.add(c);
+    public static ArrayList<Card> buildDeck() {
+        ArrayList<Card> deck = new ArrayList<Card>();
+        String[] suits = {"clubs", "diamonds", "hearts", "spades"};
+        String[] values = {"02", "03", "04", "05", "06", "07", "08", "09", "10", "A", "J", "K", "Q"};
+        for (String s : suits) {
+            for (String v : values) {
+                Card c = new Card(s, v);
+                deck.add(c);
             }
+        }
+        return deck;
+    }
+
+    public static ArrayList<Card> buildHand() {
+        ArrayList<Card> deck = Card.buildDeck();
+        ArrayList<Card> hand = new ArrayList<Card>();
+        for (int i = 0; i < 9; i++) {  // changed from 5 to 9
+            int r = (int)(Math.random() * deck.size());
+            Card c = deck.remove(r);
+            hand.add(c);
         }
         return hand;
     }
