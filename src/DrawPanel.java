@@ -10,12 +10,10 @@ import java.awt.Font;
 class DrawPanel extends JPanel implements MouseListener {
 
     private ArrayList<Card> hand;
-
-    // Rectangle object REPRESENTS A RECTANGLE
     private Rectangle button;
 
     public DrawPanel() {
-        button = new Rectangle(80, 220, 160, 26);
+        button = new Rectangle(147, 100, 160, 26);
         this.addMouseListener(this);
         hand = Card.buildHand();
     }
@@ -25,46 +23,47 @@ class DrawPanel extends JPanel implements MouseListener {
         int x = 50;
         int y = 10;
         int count = 0;
+
         for (int i = 0; i < hand.size(); i++) {
             Card c = hand.get(i);
-            if (c.getHighlight()) {
-                // draw the border around the card
-                g.drawRect(x, y, c.getImage().getWidth(), c.getImage().getHeight());
-            }
 
             // establish location of rectangle's hitbox
             c.setRectangleLocation(x, y);
 
+            if (c.getHighlight()) {
+                // draw the border around the card
+                g.drawRect(x - 2, y - 2, c.getImage().getWidth() + 4, c.getImage().getHeight() + 4);
+            }
+
             g.drawImage(c.getImage(), x, y, null);
             count = count + 1;
-            x = x + c.getImage().getWidth() + 10;
-            if (count % 3 == 0){
+
+            // move to the next column
+            x = x + c.getImage().getWidth() + 20;
+
+            // after 3 cards, go to next row
+            if (count % 3 == 0) {
                 count = 0;
-                y = y + 70;
                 x = 50;
+                y = y + c.getImage().getHeight() + 20;
             }
         }
 
         // drawing bottom button with desired font
         g.setFont(new Font("Courier New", Font.BOLD, 20));
-        g.drawString("GET NEW CARDS", 85, 240);
-        g.drawRect((int)button.getX(), (int)button.getY(), (int)button.getWidth(), (int)button.getHeight());
+        g.drawString("GET NEW CARDS", 85, 280);
+        g.drawRect(80, 260, 180, 30);
     }
 
     public void mousePressed(MouseEvent e) {
 
         Point clicked = e.getPoint();
 
-        // left click
         if (e.getButton() == 1) {
-            // if the point clicked is inside the getnewcard button
             if (button.contains(clicked)) {
                 hand = Card.buildHand();
             }
 
-            // go thru each card
-            // check if any was clicked on
-            // if it was clicked flip the card(only if left click)
             for (int i = 0; i < hand.size(); i++) {
                 Rectangle box = hand.get(i).getCardBox();
                 if (box.contains(clicked)) {
@@ -73,17 +72,11 @@ class DrawPanel extends JPanel implements MouseListener {
             }
         }
 
-        // right click
         if (e.getButton() == 3) {
             for (int i = 0; i < hand.size(); i++) {
                 Rectangle box = hand.get(i).getCardBox();
                 if (box.contains(clicked)) {
-                    if (hand.get(i).getHighlight()){
-                        hand.get(i).setIfReplace();
-                        hand.get(i).replaceCard();
-                    } else {
-                        hand.get(i).flipHighlight();
-                    }
+                    hand.get(i).flipHighlight();
                 }
             }
         }
